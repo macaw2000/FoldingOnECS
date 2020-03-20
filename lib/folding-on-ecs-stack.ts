@@ -1,9 +1,10 @@
 import * as cdk from '@aws-cdk/core';
+import {FoldingAtHome} from './folding-on-ecs-cluster'
 
 export class FoldingOnEcsStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const cluster = new FoldingAtHome(this, 'FoldingAtHome', {clusterSize: 4});
   }
 }
