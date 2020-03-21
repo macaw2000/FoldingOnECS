@@ -47,14 +47,14 @@ export interface FoldingAtHomeProps {
   containerInsights?: boolean;
 }
 
-/** 
- * Builds an ECS Cluster of g4dn.xlarge Spot instances to run the Folding at
- * Home container on. This Construct also includes building a new VPC to run the
- * cluster in. This can be overridden by passing a VPC instance into the
- * FoldingAtHomeProps.
+/**
+ * Builds an 3 node ECS Cluster of g4dn.xlarge Spot instances to run the Folding
+ * at Home container on, and the VPC to support. The default VPC can be
+ * overridden by passing a VPC instance into the FoldingAtHomeProps.
  */
 export class FoldingAtHome extends Construct {
 
+  // Declare our defaults
   public static readonly DEFAULT_MAX_AZS = 3;
   public static readonly DEFAULT_CLUSTER_SIZE = 3;
   public static readonly DEFAULT_SPOT_PRICE = '0.52';
@@ -64,17 +64,21 @@ export class FoldingAtHome extends Construct {
   constructor(scope: Construct, id: string, props: FoldingAtHomeProps={}) {
     super(scope, id);
 
+    //File in the defaults
     props.maxAzs = props.maxAzs || FoldingAtHome.DEFAULT_MAX_AZS;
     props.streamPrefix = props.streamPrefix || FoldingAtHome.DEFAULT_STREAM_PREFIX;
     props.clusterSize = props.clusterSize || FoldingAtHome.DEFAULT_CLUSTER_SIZE;
     props.spotPrice = props.spotPrice || FoldingAtHome.DEFAULT_SPOT_PRICE;
     props.image = props.image || ecs.ContainerImage.fromRegistry(FoldingAtHome.DEFAULT_IMAGE);
 
+    //if we don't have a VPC, declare one
     if (!props.vpc) {
       props.vpc = new ec2.Vpc(this, 'FoldingVPC', {
         maxAzs: props.maxAzs,
       });
     }
+
+    //The real stuff. Define our ECS GPU Cluster
     const cluster = new ecs.Cluster(this, 'FoldingCluster', {
       vpc: props.vpc,
       capacity: {
@@ -87,10 +91,12 @@ export class FoldingAtHome extends Construct {
       containerInsights: props.containerInsights
     });
 
+    //kind of obvious
     const taskDef = new ecs.TaskDefinition(this, 'FoldingAtHomeTask', {
       compatibility: ecs.Compatibility.EC2
     });
 
+    //The container def, I only allow half of the ram
     const containerDef = new ecs.ContainerDefinition(this, 'main', {
       image: props.image,
       taskDefinition: taskDef,
@@ -101,6 +107,7 @@ export class FoldingAtHome extends Construct {
       })
     });
 
+    //Define our service as a daemon so we run the container on every node
     const foldingService = new ecs.Ec2Service(this, 'FoldingService', {
       cluster: cluster,
       taskDefinition: taskDef,
