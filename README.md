@@ -73,12 +73,11 @@ a month. There would be additional costs for CloudWatch logs and network
 egress as well. I have not yet calculated an estimate for that.
 
 To calculate the avage spot price for the past 30 days in a region the following command will work on a mac.
-
-    aws ec2 describe-spot-price-history --region us-east-2 --instance-type g4dn.xlarge --start-time $(date -v-30d "+%Y-%m-%d") --product-descriptions Linux/UNIX | jq -r '.SpotPriceHistory[].SpotPrice' | awk '{ total += $1; count++ } END { print total/count }'
+    aws ec2 describe-spot-price-history --region us-east-2 --instance-type g4dn.xlarge --start-time $(date -v-30d "+%Y-%m-%d") --product-descriptions Linux/UNIX | jq '[.SpotPriceHistory[].SpotPrice | tonumber] | length as $l | add / $l'
 
 For linux the date command needs to be changed.
 
-    aws ec2 describe-spot-price-history --region us-east-2 --instance-type g4dn.xlarge --start-time $(date -d "30 days ago" "+%Y-%m-%d") --product-descriptions Linux/UNIX | jq -r '.SpotPriceHistory[].SpotPrice' | awk '{ total += $1; count++ } END { print total/count }'
+    aws ec2 describe-spot-price-history --region us-east-2 --instance-type g4dn.xlarge --start-time $(date -d "30 days ago" "+%Y-%m-%d") --product-descriptions Linux/UNIX | jq '[.SpotPriceHistory[].SpotPrice | tonumber] | length as $l | add / $l'
 
 ## Useful commands
 
