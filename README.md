@@ -47,7 +47,7 @@ and configure it `aws configure`
 
 ### Deploy
 
-    git clone <https://github.com/raykrueger/folding-on-ecs.git>
+    git clone https://github.com/raykrueger/folding-on-ecs.git
     cd folding-on-ecs
     npm install
     npm run build
@@ -59,6 +59,18 @@ To clean up, you can simply delete the stack in your cloudformation console, or
 you can have CDK do it.
 
     cdk destroy
+
+### Costs
+
+This runs three g4dn.xlarge instances as spot requests by default. The spot
+request is for the base price of that instance in us-east-2, which is $0.52
+an hour. Adjust for your region, and budget as needed.
+
+In us-east-2 spot pricing, at the time of this writing, for g4dn.xlarge is
+around $0.16 on average. Which means a single g4dn.xlarge will cost about
+$117 a month. The default configuration of three nodes will cost around $351
+a month. There would be additional costs for CloudWatch logs and network
+egress as well. I have not yet calculated an estimate for that.
 
 ## Useful commands
 
