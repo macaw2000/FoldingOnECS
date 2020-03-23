@@ -5,6 +5,6 @@ export class FoldingOnEcsStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const cluster = new FoldingAtHome(this, 'FoldingAtHome', {clusterSize: 4});
+    const cluster = new FoldingAtHome(this, 'FoldingAtHome');
   }
 }
