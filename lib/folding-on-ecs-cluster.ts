@@ -11,12 +11,6 @@ export interface FoldingAtHomeProps {
   vpc?: ec2.IVpc;
 
   /**
-   * How many Availability Zones to use
-   * @default 3
-   */
-  maxAzs?: number;
-
-  /**
    * How many host instances should we launch?
    * @default 3
    */
@@ -61,25 +55,22 @@ export class FoldingAtHome extends Construct {
   public static readonly DEFAULT_IMAGE = 'raykrueger/folding-at-home';
   public static readonly DEFAULT_STREAM_PREFIX = 'folding';
 
+  public readonly ecsCluster: ecs.Cluster;
+  public readonly taskDef: ecs.TaskDefinition;
+  public readonly containerDef: ecs.ContainerDefinition;
+  public readonly service: ecs.Ec2Service;
+
   constructor(scope: Construct, id: string, props: FoldingAtHomeProps={}) {
     super(scope, id);
 
     //File in the defaults
-    props.maxAzs = props.maxAzs || FoldingAtHome.DEFAULT_MAX_AZS;
     props.streamPrefix = props.streamPrefix || FoldingAtHome.DEFAULT_STREAM_PREFIX;
     props.clusterSize = props.clusterSize || FoldingAtHome.DEFAULT_CLUSTER_SIZE;
     props.spotPrice = props.spotPrice || FoldingAtHome.DEFAULT_SPOT_PRICE;
     props.image = props.image || ecs.ContainerImage.fromRegistry(FoldingAtHome.DEFAULT_IMAGE);
 
-    //if we don't have a VPC, declare one
-    if (!props.vpc) {
-      props.vpc = new ec2.Vpc(this, 'FoldingVPC', {
-        maxAzs: props.maxAzs,
-      });
-    }
-
     //The real stuff. Define our ECS GPU Cluster
-    const cluster = new ecs.Cluster(this, 'FoldingCluster', {
+    this.ecsCluster = new ecs.Cluster(this, 'FoldingCluster', {
       vpc: props.vpc,
       capacity: {
         instanceType: ec2.InstanceType.of(ec2.InstanceClass.G4DN, ec2.InstanceSize.XLARGE),
@@ -92,14 +83,14 @@ export class FoldingAtHome extends Construct {
     });
 
     //kind of obvious
-    const taskDef = new ecs.TaskDefinition(this, 'FoldingAtHomeTask', {
+    this.taskDef = new ecs.TaskDefinition(this, 'FoldingAtHomeTask', {
       compatibility: ecs.Compatibility.EC2
     });
 
     //The container def, I only allow half of the ram
-    const containerDef = new ecs.ContainerDefinition(this, 'main', {
+    this.containerDef = new ecs.ContainerDefinition(this, 'main', {
       image: props.image,
-      taskDefinition: taskDef,
+      taskDefinition: this.taskDef,
       memoryLimitMiB: 8192,
       gpuCount: 1,
       logging: ecs.LogDriver.awsLogs({
@@ -108,9 +99,9 @@ export class FoldingAtHome extends Construct {
     });
 
     //Define our service as a daemon so we run the container on every node
-    const foldingService = new ecs.Ec2Service(this, 'FoldingService', {
-      cluster: cluster,
-      taskDefinition: taskDef,
+    this.service = new ecs.Ec2Service(this, 'FoldingService', {
+      cluster: this.ecsCluster,
+      taskDefinition: this.taskDef,
       daemon: true
     });
 

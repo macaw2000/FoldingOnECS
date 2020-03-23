@@ -1,13 +1,45 @@
-import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
+import { expect as expectCDK, matchTemplate, MatchStyle, haveResource, countResourcesLike } from '@aws-cdk/assert';
 import * as cdk from '@aws-cdk/core';
 import FoldingOnEcs = require('../lib/folding-on-ecs-stack');
+import * as ecs from '@aws-cdk/aws-ecs';
 
-test('Empty Stack', () => {
-    const app = new cdk.App();
-    // WHEN
-    const stack = new FoldingOnEcs.FoldingOnEcsStack(app, 'MyTestStack');
-    // THEN
-    expectCDK(stack).to(matchTemplate({
-      "Resources": {}
-    }, MatchStyle.EXACT))
+//added so I could verify it is safe to remove my default vpc, and let the ecs.Cluster do it
+test('Creates Default VPC', () => {
+  const app = new cdk.App();
+  const stack = new FoldingOnEcs.FoldingOnEcsStack(app, 'MyTestStack');
+  expectCDK(stack).to(haveResource("AWS::EC2::VPC"));
+});
+
+test('Deploys default image', () => {
+  const app = new cdk.App();
+  const stack = new FoldingOnEcs.FoldingOnEcsStack(app, 'MyTestStack');
+
+  //cdk assert bug? haveResource would not match this, but countResourcesLike works
+  expectCDK(stack).to(countResourcesLike('AWS::ECS::TaskDefinition', 1, {
+    ContainerDefinitions: [
+      {
+        Essential: true,
+        Image: 'raykrueger/folding-at-home'
+      }
+    ]
+  }));
+});
+
+test('Deploys custom image', () => {
+  const app = new cdk.App();
+  const stack = new FoldingOnEcs.FoldingOnEcsStack(app, 'MyTestStack', {
+    clusterProps: {
+      image: ecs.ContainerImage.fromRegistry('example/example')
+    }
+  });
+
+  //cdk assert bug? haveResource would not match this, but countResourcesLike works
+  expectCDK(stack).to(countResourcesLike('AWS::ECS::TaskDefinition', 1, {
+    ContainerDefinitions: [
+      {
+        Essential: true,
+        Image: 'example/example'
+      }
+    ]
+  }));
 });
