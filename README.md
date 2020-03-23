@@ -47,7 +47,7 @@ and configure it `aws configure`
 
 ### Deploy
 
-    git clone https://github.com/raykrueger/folding-on-ecs.git
+    git clone https://github.com/raykrueger/FoldingOnECS.git
     cd folding-on-ecs
     npm install
     npm run build
