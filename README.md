@@ -48,7 +48,7 @@ and configure it `aws configure`
 ### Deploy
 
     git clone https://github.com/raykrueger/FoldingOnECS.git
-    cd folding-on-ecs
+    cd FoldingOnECS
     npm install
     npm run build
     cdk deploy
