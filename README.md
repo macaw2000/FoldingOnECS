@@ -32,9 +32,7 @@ savings over on-demand costs.
 For me, personally, I also needed an excuse to force myself to do something
 in CDK. That being said, this is the first thing I've built with CDK. Which
 means I'm definitely open to feedback on how it could be done better. For
-example, I haven't learned the test framework yet, that's next. Test driven
-development and all that aside, the stack has been tested and works well. I
-will update the tests soon.
+example, I'm beginning to realize that CDK "apps" don't share well.
 
 ## How to run it
 
