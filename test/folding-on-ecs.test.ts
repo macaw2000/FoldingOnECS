@@ -2,6 +2,7 @@ import { expect as expectCDK, matchTemplate, MatchStyle, haveResource, countReso
 import * as cdk from '@aws-cdk/core';
 import FoldingOnEcs = require('../lib/folding-on-ecs-stack');
 import * as ecs from '@aws-cdk/aws-ecs';
+import {FoldingAtHome} from '../lib/folding-on-ecs-cluster'
 
 //added so I could verify it is safe to remove my default vpc, and let the ecs.Cluster do it
 test('Creates Default VPC', () => {
@@ -27,11 +28,18 @@ test('Deploys default image', () => {
 
 test('Deploys custom image', () => {
   const app = new cdk.App();
-  const stack = new FoldingOnEcs.FoldingOnEcsStack(app, 'MyTestStack', {
-    clusterProps: {
-      image: ecs.ContainerImage.fromRegistry('example/example')
+
+  class TestStack extends cdk.Stack {
+    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+      super(scope, id, props);
+
+      const cluster = new FoldingAtHome(this, 'FoldingAtHome', {
+        image: ecs.RepositoryImage.fromRegistry('example/example')
+      });
     }
-  });
+  }
+
+  const stack = new TestStack(app, 'TestStack');
 
   //cdk assert bug? haveResource would not match this, but countResourcesLike works
   expectCDK(stack).to(countResourcesLike('AWS::ECS::TaskDefinition', 1, {

@@ -1,17 +1,10 @@
 import * as cdk from '@aws-cdk/core';
-import {FoldingAtHome, FoldingAtHomeProps} from './folding-on-ecs-cluster'
-
-export interface FoldingOnEcsStackProps extends cdk.StackProps {
-  clusterProps?: FoldingAtHomeProps;
-}
+import {FoldingAtHome} from './folding-on-ecs-cluster'
 
 export class FoldingOnEcsStack extends cdk.Stack {
-
-  public readonly cluster: FoldingAtHome;
-
-  constructor(scope: cdk.Construct, id: string, props?: FoldingOnEcsStackProps) {
+  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    this.cluster = new FoldingAtHome(this, 'FoldingAtHome', props?.clusterProps);
+    const cluster = new FoldingAtHome(this, 'FoldingAtHome');
   }
 }
