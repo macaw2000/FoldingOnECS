@@ -1,9 +1,9 @@
 # Folding on Amazon Elastic Container Service
 
-This CDK App builds an [Amazon ECS](https://aws.amazon.com/ecs/) GPU Cluster on
+This Sample CDK App builds an [Amazon ECS](https://aws.amazon.com/ecs/) GPU Cluster on
 AWS using Spot instances, and to run
 [Folding@Home](https://foldingathome.org/). Folding@Home is deployed via the
-[raykrueger/folding-at-home](https://github.com/raykrueger/FoldingAtHomeContainer)
+[raykrueger/FoldingAtHomeContainer](https://github.com/raykrueger/FoldingAtHomeContainer)
 container. The container is configured to consume the GPU on each instance in
 the cluster.
 
