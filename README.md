@@ -34,13 +34,25 @@ in CDK. That being said, this is the first thing I've built with CDK. Which
 means I'm definitely open to feedback on how it could be done better. For
 example, I'm beginning to realize that CDK "apps" don't share well.
 
+## Design
+
+This Sample Application is based on two depdencies namely the [Folding on
+ECS](https://github.com/raykrueger/folding-on-ecs) AWS CDK Library, which is
+[hosted on npm](https://www.npmjs.com/package/@raykrueger/folding-on-ecs),
+and the [Folding at Home Container](raykrueger/FoldingAtHomeContainer) which
+is hosted on [Docker
+Hub](https://hub.docker.com/repository/docker/raykrueger/folding-at-home).
+
+This sample application is meant to be run as-is, or cloned and modified to
+your needs.
+
 ## How to run it
 
 ### Prerquisites
 
 1. Install the [AWS
 CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
-and configure it `aws configure`
+and configure it via `aws configure`
 1. Install the [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html)
 
 ### Deploy
