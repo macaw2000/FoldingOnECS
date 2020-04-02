@@ -2,7 +2,7 @@ import { expect as expectCDK, matchTemplate, MatchStyle, haveResource, countReso
 import * as cdk from '@aws-cdk/core';
 import FoldingOnEcs = require('../lib/folding-on-ecs-stack');
 import * as ecs from '@aws-cdk/aws-ecs';
-import {FoldingAtHome} from '../lib/folding-on-ecs-cluster'
+import { FoldingAtHome } from '@raykrueger/folding-on-ecs';
 
 //added so I could verify it is safe to remove my default vpc, and let the ecs.Cluster do it
 test('Creates Default VPC', () => {
